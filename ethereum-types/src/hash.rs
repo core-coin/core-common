@@ -41,7 +41,7 @@ impl_fixed_hash_serde!(H64, 8);
 #[cfg(feature = "codec")]
 impl_fixed_hash_codec!(H64, 8);
 
-pub use primitive_types::{H128, H160, H256};
+pub use primitive_types::{H128, H160, H176, H256};
 
 construct_fixed_hash! {
 	#[cfg_attr(feature = "codec", derive(scale_info::TypeInfo))]
