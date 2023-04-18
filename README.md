@@ -1,4 +1,6 @@
-[![Continuous integration](https://github.com/paritytech/parity-common/actions/workflows/ci.yml/badge.svg)](https://github.com/paritytech/parity-common/actions/workflows/ci.yml)
+# Core-Common
 
-# parity-common
-Collection of crates used in [Parity Technologies](https://www.paritytech.io/) projects
+Collection of crates used in [Core Blockchain](https://coreblockchain.cc/) projects
+
+Fork of [parity-common](https://github.com/paritytech/parity-common)
+
