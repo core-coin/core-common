@@ -40,6 +40,13 @@ construct_uint! {
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
 	pub struct U256(4);
 }
+
+construct_uint! {
+	/// 456-bit unsigned integer.
+	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
+	pub struct U456(8);
+}
+
 construct_uint! {
 	/// 512-bits unsigned integer.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
@@ -74,6 +81,13 @@ construct_fixed_hash! {
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
 	pub struct H384(48);
 }
+
+construct_fixed_hash! {
+	/// Fixed-size uninterpreted hash type with 48 bytes (384 bits) size.
+	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
+	pub struct H456(57);
+}
+
 construct_fixed_hash! {
 	/// Fixed-size uninterpreted hash type with 64 bytes (512 bits) size.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
@@ -92,6 +106,7 @@ mod num_traits {
 
 	impl_uint_num_traits!(U128, 2);
 	impl_uint_num_traits!(U256, 4);
+	impl_uint_num_traits!(U456, 8);
 	impl_uint_num_traits!(U512, 8);
 }
 
@@ -102,6 +117,7 @@ mod serde {
 
 	impl_uint_serde!(U128, 2);
 	impl_uint_serde!(U256, 4);
+	impl_uint_serde!(U456, 8);
 	impl_uint_serde!(U512, 8);
 
 	impl_fixed_hash_serde!(H128, 16);
@@ -109,6 +125,7 @@ mod serde {
 	impl_fixed_hash_serde!(H176, 22);
 	impl_fixed_hash_serde!(H256, 32);
 	impl_fixed_hash_serde!(H384, 48);
+	impl_fixed_hash_serde!(H456, 57);
 	impl_fixed_hash_serde!(H512, 64);
 	impl_fixed_hash_serde!(H768, 96);
 }
@@ -120,6 +137,7 @@ mod codec {
 
 	impl_uint_codec!(U128, 2);
 	impl_uint_codec!(U256, 4);
+	impl_uint_codec!(U456, 8);
 	impl_uint_codec!(U512, 8);
 
 	impl_fixed_hash_codec!(H128, 16);
@@ -127,6 +145,7 @@ mod codec {
 	impl_fixed_hash_codec!(H176, 22);
 	impl_fixed_hash_codec!(H256, 32);
 	impl_fixed_hash_codec!(H384, 48);
+	impl_fixed_hash_codec!(H456, 57);
 	impl_fixed_hash_codec!(H512, 64);
 	impl_fixed_hash_codec!(H768, 96);
 }
@@ -138,6 +157,7 @@ mod rlp {
 
 	impl_uint_rlp!(U128, 2);
 	impl_uint_rlp!(U256, 4);
+	impl_uint_rlp!(U456, 8);
 	impl_uint_rlp!(U512, 8);
 
 	impl_fixed_hash_rlp!(H128, 16);
@@ -145,6 +165,7 @@ mod rlp {
 	impl_fixed_hash_rlp!(H176, 22);
 	impl_fixed_hash_rlp!(H256, 32);
 	impl_fixed_hash_rlp!(H384, 48);
+	impl_fixed_hash_rlp!(H456, 57);
 	impl_fixed_hash_rlp!(H512, 64);
 	impl_fixed_hash_rlp!(H768, 96);
 }
@@ -188,7 +209,7 @@ impl TryFrom<U256> for U128 {
 	fn try_from(value: U256) -> Result<U128, Error> {
 		let U256(ref arr) = value;
 		if arr[2] | arr[3] != 0 {
-			return Err(Error::Overflow)
+			return Err(Error::Overflow);
 		}
 		let mut ret = [0; 2];
 		ret[0] = arr[0];
@@ -203,7 +224,7 @@ impl TryFrom<U512> for U256 {
 	fn try_from(value: U512) -> Result<U256, Error> {
 		let U512(ref arr) = value;
 		if arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow)
+			return Err(Error::Overflow);
 		}
 		let mut ret = [0; 4];
 		ret[0] = arr[0];
@@ -220,7 +241,7 @@ impl TryFrom<U512> for U128 {
 	fn try_from(value: U512) -> Result<U128, Error> {
 		let U512(ref arr) = value;
 		if arr[2] | arr[3] | arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow)
+			return Err(Error::Overflow);
 		}
 		let mut ret = [0; 2];
 		ret[0] = arr[0];
@@ -267,7 +288,7 @@ impl<'a> TryFrom<&'a U512> for U256 {
 	fn try_from(value: &'a U512) -> Result<U256, Error> {
 		let U512(ref arr) = *value;
 		if arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow)
+			return Err(Error::Overflow);
 		}
 		let mut ret = [0; 4];
 		ret[0] = arr[0];
