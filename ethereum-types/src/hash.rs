@@ -6,7 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::{U128, U256, U456, U512, U64};
+use crate::{U128, U256, U512, U64};
 use fixed_hash::*;
 #[cfg(feature = "codec")]
 use impl_codec::impl_fixed_hash_codec;
@@ -14,6 +14,7 @@ use impl_codec::impl_fixed_hash_codec;
 use impl_rlp::impl_fixed_hash_rlp;
 #[cfg(feature = "serialize")]
 use impl_serde::impl_fixed_hash_serde;
+use primitive_types::U456;
 
 pub trait BigEndianHash {
 	type Uint;
