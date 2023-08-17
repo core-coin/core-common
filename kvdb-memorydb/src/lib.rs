@@ -49,7 +49,7 @@ impl KeyValueDB for InMemory {
 		let columns = self.columns.read();
 		match columns.get(&col) {
 			None => Err(invalid_column(col)),
-			Some(map) => Ok(map.iter().find(|&(ref k, _)| k.starts_with(prefix)).map(|(_, v)| v.to_vec())),
+			Some(map) => Ok(map.iter().find(|(k, _)| k.starts_with(prefix)).map(|(_, v)| v.to_vec())),
 		}
 	}
 
@@ -109,7 +109,7 @@ impl KeyValueDB for InMemory {
 			Some(map) => Box::new(
 				map.clone()
 					.into_iter()
-					.filter(move |&(ref k, _)| k.starts_with(prefix))
+					.filter(move |(ref k, _)| k.starts_with(prefix))
 					.map(|(k, v)| Ok((k.into(), v))),
 			),
 			None => Box::new(std::iter::once(Err(invalid_column(col)))),

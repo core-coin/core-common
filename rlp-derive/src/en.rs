@@ -78,6 +78,7 @@ pub fn impl_encodable_wrapper(ast: &syn::DeriveInput) -> TokenStream {
 	}
 }
 
+#[allow(clippy::option_if_let_else)]
 fn encodable_field(index: usize, field: &syn::Field) -> TokenStream {
 	let ident = if let Some(ident) = &field.ident {
 		quote! { #ident }

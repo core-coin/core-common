@@ -257,9 +257,7 @@ macro_rules! construct_fixed_hash {
 		#[cfg_attr(feature = "dev", allow(expl_impl_clone_on_copy))]
 		impl $crate::core_::clone::Clone for $name {
 			fn clone(&self) -> $name {
-				let mut ret = $name::zero();
-				ret.0.copy_from_slice(&self.0);
-				ret
+				*self
 			}
 		}
 
@@ -358,6 +356,7 @@ macro_rules! impl_byteorder_for_fixed_hash {
 				&self[(Self::len_bytes() - n)..]
 			}
 
+			#[allow(clippy::wrong_self_convention)]
 			fn to_low_u64_with_byteorder<B>(&self) -> u64
 			where
 				B: $crate::byteorder::ByteOrder,

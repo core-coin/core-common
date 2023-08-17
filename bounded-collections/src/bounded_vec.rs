@@ -89,7 +89,7 @@ where
 					while let Some(value) = seq.next_element()? {
 						values.push(value);
 						if values.len() > max {
-							return Err(A::Error::custom("out of bounds"))
+							return Err(A::Error::custom("out of bounds"));
 						}
 					}
 
@@ -217,7 +217,7 @@ where
 
 impl<'a, T: Ord, Bound: Get<u32>> Ord for BoundedSlice<'a, T, Bound> {
 	fn cmp(&self, other: &Self) -> core::cmp::Ordering {
-		self.0.cmp(&other.0)
+		self.0.cmp(other.0)
 	}
 }
 
@@ -246,7 +246,7 @@ impl<'a, T, S: Get<u32>> TruncateFrom<&'a [T]> for BoundedSlice<'a, T, S> {
 
 impl<'a, T, S> Clone for BoundedSlice<'a, T, S> {
 	fn clone(&self) -> Self {
-		BoundedSlice(self.0, PhantomData)
+		*self
 	}
 }
 
@@ -303,7 +303,7 @@ impl<T: Decode, S: Get<u32>> Decode for BoundedVec<T, S> {
 		// len is too big.
 		let len: u32 = <Compact<u32>>::decode(input)?.into();
 		if len > S::get() {
-			return Err("BoundedVec exceeds its limit".into())
+			return Err("BoundedVec exceeds its limit".into());
 		}
 		let inner = decode_vec_with_len(input, len as usize)?;
 		Ok(Self(inner, PhantomData))
@@ -471,6 +471,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 	/// Returns `Ok(maybe_removed)` if the item was inserted, where `maybe_removed` is
 	/// `Some(removed)` if an item was removed to make room for the new one. Returns `Err(())` if
 	/// `element` cannot be inserted.
+	#[allow(clippy::result_unit_err)]
 	pub fn force_insert_keep_right(&mut self, index: usize, mut element: T) -> Result<Option<T>, ()> {
 		// Check against panics.
 		if Self::bound() < index || self.len() < index {
@@ -481,7 +482,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 			Ok(None)
 		} else {
 			if index == 0 {
-				return Err(())
+				return Err(());
 			}
 			core::mem::swap(&mut self[0], &mut element);
 			// `[0..index] cannot panic since self.len() >= index.
@@ -501,14 +502,15 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 	/// Returns `Ok(maybe_removed)` if the item was inserted, where `maybe_removed` is
 	/// `Some(removed)` if an item was removed to make room for the new one. Returns `Err(())` if
 	/// `element` cannot be inserted.
+	#[allow(clippy::result_unit_err)]
 	pub fn force_insert_keep_left(&mut self, index: usize, element: T) -> Result<Option<T>, ()> {
 		// Check against panics.
 		if Self::bound() < index || self.len() < index || Self::bound() == 0 {
-			return Err(())
+			return Err(());
 		}
 		// Noop condition.
 		if Self::bound() == index && self.len() <= Self::bound() {
-			return Err(())
+			return Err(());
 		}
 		let maybe_removed = if self.is_full() {
 			// defensive-only: since we are at capacity, this is a noop.
@@ -536,11 +538,11 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 	pub fn slide(&mut self, index: usize, insert_position: usize) -> bool {
 		// Check against panics.
 		if self.len() <= index || self.len() < insert_position || index == usize::MAX {
-			return false
+			return false;
 		}
 		// Noop conditions.
 		if index == insert_position || index + 1 == insert_position {
-			return false
+			return false;
 		}
 		if insert_position < index && index < self.len() {
 			// --- --- --- === === === === @@@ --- --- ---
@@ -553,7 +555,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 			// --- --- --- @@@ === === === === --- --- ---
 			//             ^N^
 			self[insert_position..index + 1].rotate_right(1);
-			return true
+			return true;
 		} else if insert_position > 0 && index + 1 < insert_position {
 			// Note that the apparent asymmetry of these two branches is due to the
 			// fact that the "new" position is the position to be inserted *before*.
@@ -567,7 +569,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 			// --- --- --- === === === === @@@ --- --- ---
 			//                             ^N^
 			self[index..insert_position].rotate_left(1);
-			return true
+			return true;
 		}
 
 		debug_assert!(false, "all noop conditions should have been covered above");
@@ -579,7 +581,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 	/// Infallible, but if the bound is zero, then it's a no-op.
 	pub fn force_push(&mut self, element: T) {
 		if Self::bound() > 0 {
-			self.0.truncate(Self::bound() as usize - 1);
+			self.0.truncate(Self::bound() - 1);
 			self.0.push(element);
 		}
 	}
@@ -596,6 +598,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 
 	/// Exactly the same semantics as [`Vec::extend`], but returns an error and does nothing if the
 	/// length of the outcome is larger than the bound.
+	#[allow(clippy::result_unit_err)]
 	pub fn try_extend(&mut self, with: impl IntoIterator<Item = T> + ExactSizeIterator) -> Result<(), ()> {
 		if with.len().saturating_add(self.len()) <= Self::bound() {
 			self.0.extend(with);
@@ -607,6 +610,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 
 	/// Exactly the same semantics as [`Vec::append`], but returns an error and does nothing if the
 	/// length of the outcome is larger than the bound.
+	#[allow(clippy::result_unit_err)]
 	pub fn try_append(&mut self, other: &mut Vec<T>) -> Result<(), ()> {
 		if other.len().saturating_add(self.len()) <= Self::bound() {
 			self.0.append(other);
@@ -662,7 +666,7 @@ impl<T, S: Get<u32>> BoundedVec<T, S> {
 impl<T, S> BoundedVec<T, S> {
 	/// Return a [`BoundedSlice`] with the content and bound of [`Self`].
 	pub fn as_bounded_slice(&self) -> BoundedSlice<T, S> {
-		BoundedSlice(&self.0[..], PhantomData::default())
+		BoundedSlice(&self.0[..], PhantomData)
 	}
 }
 
@@ -879,7 +883,7 @@ where
 	BoundRhs: Get<u32>,
 {
 	fn partial_cmp(&self, other: &BoundedSlice<'a, T, BoundRhs>) -> Option<core::cmp::Ordering> {
-		(&*self.0).partial_cmp(other.0)
+		(*self.0).partial_cmp(other.0)
 	}
 }
 

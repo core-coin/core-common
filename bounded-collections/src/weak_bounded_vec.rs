@@ -202,6 +202,7 @@ impl<T, S: Get<u32>> WeakBoundedVec<T, S> {
 	/// # Panics
 	///
 	/// Panics if `index > len`.
+	#[allow(clippy::result_unit_err)]
 	pub fn try_insert(&mut self, index: usize, element: T) -> Result<(), ()> {
 		if self.len() < Self::bound() {
 			self.0.insert(index, element);
@@ -217,6 +218,7 @@ impl<T, S: Get<u32>> WeakBoundedVec<T, S> {
 	/// # Panics
 	///
 	/// Panics if the new capacity exceeds isize::MAX bytes.
+	#[allow(clippy::result_unit_err)]
 	pub fn try_push(&mut self, element: T) -> Result<(), ()> {
 		if self.len() < Self::bound() {
 			self.0.push(element);
@@ -419,7 +421,7 @@ where
 	BoundRhs: Get<u32>,
 {
 	fn partial_cmp(&self, other: &BoundedSlice<'a, T, BoundRhs>) -> Option<core::cmp::Ordering> {
-		(&*self.0).partial_cmp(other.0)
+		(*self.0).partial_cmp(other.0)
 	}
 }
 

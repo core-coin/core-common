@@ -254,7 +254,7 @@ impl DBAndColumns {
 	fn cf(&self, i: usize) -> io::Result<&ColumnFamily> {
 		let name = self.column_names.get(i).ok_or_else(|| invalid_column(i as u32))?;
 		self.db
-			.cf_handle(&name)
+			.cf_handle(name)
 			.ok_or_else(|| other_io_err(format!("invalid column name: {name}")))
 	}
 }
@@ -285,7 +285,7 @@ fn generate_options(config: &DatabaseConfig) -> Options {
 	} else {
 		opts.set_max_open_files(config.max_open_files);
 	}
-	opts.set_bytes_per_sync(1 * MB as u64);
+	opts.set_bytes_per_sync(MB as u64);
 	opts.set_keep_log_file_num(1);
 	opts.increase_parallelism(cmp::max(1, num_cpus::get() as i32 / 2));
 	if let Some(m) = config.max_total_wal_size {
@@ -370,17 +370,16 @@ impl Database {
 		block_opts: &BlockBasedOptions,
 	) -> io::Result<rocksdb::DB> {
 		let cf_descriptors: Vec<_> = (0..config.columns)
-			.map(|i| ColumnFamilyDescriptor::new(column_names[i as usize], config.column_config(&block_opts, i)))
+			.map(|i| ColumnFamilyDescriptor::new(column_names[i as usize], config.column_config(block_opts, i)))
 			.collect();
 
-		let db = match DB::open_cf_descriptors(&opts, path.as_ref(), cf_descriptors) {
+		let db = match DB::open_cf_descriptors(opts, path.as_ref(), cf_descriptors) {
 			Err(_) => {
 				// retry and create CFs
-				match DB::open_cf(&opts, path.as_ref(), &[] as &[&str]) {
+				match DB::open_cf(opts, path.as_ref(), &[] as &[&str]) {
 					Ok(mut db) => {
 						for (i, name) in column_names.iter().enumerate() {
-							let _ = db
-								.create_cf(name, &config.column_config(&block_opts, i as u32))
+							db.create_cf(name, &config.column_config(block_opts, i as u32))
 								.map_err(other_io_err)?;
 						}
 						Ok(db)
@@ -405,7 +404,7 @@ impl Database {
 		secondary_path: P,
 		column_names: &[String],
 	) -> io::Result<rocksdb::DB> {
-		let db = DB::open_cf_as_secondary(&opts, path.as_ref(), secondary_path.as_ref(), column_names);
+		let db = DB::open_cf_as_secondary(opts, path.as_ref(), secondary_path.as_ref(), column_names);
 
 		Ok(match db {
 			Ok(db) => db,
@@ -494,7 +493,7 @@ impl Database {
 	/// Iterator over the data in the given database column index.
 	/// Will hold a lock until the iterator is dropped
 	/// preventing the database from being closed.
-	pub fn iter<'a>(&'a self, col: u32) -> impl Iterator<Item = io::Result<DBKeyValue>> + 'a {
+	pub fn iter(&self, col: u32) -> impl Iterator<Item = io::Result<DBKeyValue>> + '_ {
 		let read_opts = generate_read_options();
 		iter::IterationHandler::iter(&self.inner, col, read_opts)
 	}
@@ -541,8 +540,8 @@ impl Database {
 		let DBAndColumns { ref mut db, ref mut column_names } = self.inner;
 		let col = column_names.len() as u32;
 		let name = format!("col{}", col);
-		let col_config = self.config.column_config(&self.block_opts, col as u32);
-		let _ = db.create_cf(&name, &col_config).map_err(other_io_err)?;
+		let col_config = self.config.column_config(&self.block_opts, col);
+		db.create_cf(&name, &col_config).map_err(other_io_err)?;
 		column_names.push(name);
 		Ok(())
 	}

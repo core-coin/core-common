@@ -16,7 +16,7 @@
 //! the field deserialization fails, as we don't serialize field
 //! names and there is no way to tell if it is present or not.
 
-#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
+#![warn(clippy::all, clippy::nursery)]
 
 extern crate proc_macro;
 
