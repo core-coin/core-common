@@ -27,7 +27,7 @@ impl_uint_serde!(U64, 1);
 #[cfg(feature = "codec")]
 impl_uint_codec!(U64, 1);
 
-pub use primitive_types::{U128, U256, U456, U512};
+pub use primitive_types::{U128, U1368, U256, U456, U512};
 
 #[cfg(test)]
 mod tests {

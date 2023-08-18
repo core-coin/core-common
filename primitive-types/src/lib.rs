@@ -53,6 +53,12 @@ construct_uint! {
 	pub struct U512(8);
 }
 
+construct_uint! {
+	/// 1368-bits unsigned integer.
+	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
+	pub struct U1368(22);
+}
+
 construct_fixed_hash! {
 	/// Fixed-size uninterpreted hash type with 16 bytes (128 bits) size.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
@@ -99,6 +105,12 @@ construct_fixed_hash! {
 	pub struct H768(96);
 }
 
+construct_fixed_hash! {
+	/// Fixed-size uninterpreted hash type with 96 bytes (768 bits) size.
+	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
+	pub struct H1368(171);
+}
+
 #[cfg(feature = "num-traits")]
 mod num_traits {
 	use super::*;
@@ -119,6 +131,7 @@ mod serde {
 	impl_uint_serde!(U256, 4);
 	impl_uint_serde!(U456, 8);
 	impl_uint_serde!(U512, 8);
+	impl_uint_serde!(U1368, 22);
 
 	impl_fixed_hash_serde!(H128, 16);
 	impl_fixed_hash_serde!(H160, 20);
@@ -128,6 +141,7 @@ mod serde {
 	impl_fixed_hash_serde!(H456, 57);
 	impl_fixed_hash_serde!(H512, 64);
 	impl_fixed_hash_serde!(H768, 96);
+	impl_fixed_hash_serde!(H1368, 171);
 }
 
 #[cfg(feature = "impl-codec")]
@@ -139,6 +153,7 @@ mod codec {
 	impl_uint_codec!(U256, 4);
 	impl_uint_codec!(U456, 8);
 	impl_uint_codec!(U512, 8);
+	impl_uint_codec!(U1368, 22);
 
 	impl_fixed_hash_codec!(H128, 16);
 	impl_fixed_hash_codec!(H160, 20);
@@ -148,6 +163,7 @@ mod codec {
 	impl_fixed_hash_codec!(H456, 57);
 	impl_fixed_hash_codec!(H512, 64);
 	impl_fixed_hash_codec!(H768, 96);
+	impl_fixed_hash_codec!(H1368, 171);
 }
 
 #[cfg(feature = "impl-rlp")]
@@ -159,6 +175,7 @@ mod rlp {
 	impl_uint_rlp!(U256, 4);
 	impl_uint_rlp!(U456, 8);
 	impl_uint_rlp!(U512, 8);
+	impl_uint_rlp!(U1368, 22);
 
 	impl_fixed_hash_rlp!(H128, 16);
 	impl_fixed_hash_rlp!(H160, 20);
@@ -168,6 +185,7 @@ mod rlp {
 	impl_fixed_hash_rlp!(H456, 57);
 	impl_fixed_hash_rlp!(H512, 64);
 	impl_fixed_hash_rlp!(H768, 96);
+	impl_fixed_hash_rlp!(H1368, 171);
 }
 
 impl_fixed_hash_conversions!(H256, H160);
@@ -209,7 +227,7 @@ impl TryFrom<U256> for U128 {
 	fn try_from(value: U256) -> Result<U128, Error> {
 		let U256(ref arr) = value;
 		if arr[2] | arr[3] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 2];
 		ret[0] = arr[0];
@@ -224,7 +242,7 @@ impl TryFrom<U512> for U256 {
 	fn try_from(value: U512) -> Result<U256, Error> {
 		let U512(ref arr) = value;
 		if arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 4];
 		ret[0] = arr[0];
@@ -241,7 +259,7 @@ impl TryFrom<U512> for U128 {
 	fn try_from(value: U512) -> Result<U128, Error> {
 		let U512(ref arr) = value;
 		if arr[2] | arr[3] | arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 2];
 		ret[0] = arr[0];
@@ -288,7 +306,7 @@ impl<'a> TryFrom<&'a U512> for U256 {
 	fn try_from(value: &'a U512) -> Result<U256, Error> {
 		let U512(ref arr) = *value;
 		if arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 4];
 		ret[0] = arr[0];
