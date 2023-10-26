@@ -80,7 +80,7 @@ construct_fixed_hash! {
 construct_fixed_hash! {
 	/// Fixed-size uninterpreted hash type with 20 bytes (160 bits) size.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
-	pub struct H176(22);
+	pub struct H176(22, true);
 }
 
 construct_fixed_hash! {
