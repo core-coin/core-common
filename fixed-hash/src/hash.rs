@@ -41,9 +41,10 @@
 ///
 /// The second argument is used to control whether the hash type should be prefixed with `0x` when
 /// formatting it as a string. When it is passed - no 0x printed, when it is not passed - 0x is
+/// printed.
 #[macro_export(local_inner_macros)]
 macro_rules! construct_fixed_hash {
-	( $(#[$attr:meta])* $visibility:vis struct $name:ident ( $n_bytes:expr $(, $prefix:expr)? ); ) => {
+	( $(#[$attr:meta])* $visibility:vis struct $name:ident ( $n_bytes:expr $(, $cut_prefix:expr)? ); ) => {
 		#[repr(C)]
 		$(#[$attr])*
 		$visibility struct $name (pub [u8; $n_bytes]);
@@ -220,7 +221,7 @@ macro_rules! construct_fixed_hash {
 		#[allow(unreachable_code)]
 		impl $crate::core_::fmt::Display for $name {
 			fn fmt(&self, f: &mut $crate::core_::fmt::Formatter) -> $crate::core_::fmt::Result {
-				$($prefix;
+				$($cut_prefix;
 					for i in &self.0 {
 						$crate::core_::write!(f, "{:02x}", i)?;
 					}
@@ -242,7 +243,7 @@ macro_rules! construct_fixed_hash {
 		#[allow(unreachable_code)]
 		impl $crate::core_::fmt::LowerHex for $name {
 			fn fmt(&self, f: &mut $crate::core_::fmt::Formatter) -> $crate::core_::fmt::Result {
-				$($prefix;
+				$($cut_prefix;
 					for i in &self.0 {
 						$crate::core_::write!(f, "{:02x}", i)?;
 					}
@@ -262,7 +263,7 @@ macro_rules! construct_fixed_hash {
 		#[allow(unreachable_code)]
 		impl $crate::core_::fmt::UpperHex for $name {
 			fn fmt(&self, f: &mut $crate::core_::fmt::Formatter) -> $crate::core_::fmt::Result {
-				$($prefix;
+				$($cut_prefix;
 					for i in &self.0 {
 						$crate::core_::write!(f, "{:0x}", i)?;
 					}
