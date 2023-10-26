@@ -8,7 +8,7 @@
 
 //! Testing to and from f64 lossy for U256 primitive type.
 
-use primitive_types::U256;
+use primitive_types::{H160, H176, H256, U256};
 
 #[test]
 #[allow(clippy::float_cmp)]
@@ -73,4 +73,21 @@ fn convert_f64_to_u256_non_normal() {
 #[test]
 fn f64_to_u256_truncation() {
 	assert_eq!(U256::from_f64_lossy(10.5), 10.into());
+}
+
+#[test]
+fn hash_prefix() {
+	assert_eq!(H176::default().to_string(), "00000000000000000000000000000000000000000000");
+	assert_eq!(
+		H176::from_slice(&[0xab, 3, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6]).to_string(),
+		"ab030304050607080102030405060708010203040506"
+	);
+
+	assert_eq!(H160::default().to_string(), "0x0000…0000");
+	assert_eq!(
+		H160::from_slice(&[1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]).to_string(),
+		"0x0102…0304"
+	);
+
+	assert_eq!(H256::default().to_string(), "0x0000…0000");
 }
