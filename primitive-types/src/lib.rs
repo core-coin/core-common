@@ -137,7 +137,7 @@ mod num_traits {
 #[cfg(feature = "impl-serde")]
 mod serde {
 	use super::*;
-	use impl_serde::{impl_fixed_hash_serde, impl_uint_serde};
+	use impl_serde::{impl_fixed_hash_serde, impl_fixed_hash_serde_no_0x_prefix, impl_uint_serde};
 
 	impl_uint_serde!(U128, 2);
 	impl_uint_serde!(U256, 4);
@@ -147,7 +147,7 @@ mod serde {
 
 	impl_fixed_hash_serde!(H128, 16);
 	impl_fixed_hash_serde!(H160, 20);
-	impl_fixed_hash_serde!(H176, 22);
+	impl_fixed_hash_serde_no_0x_prefix!(H176, 22);
 	impl_fixed_hash_serde!(H256, 32);
 	impl_fixed_hash_serde!(H384, 48);
 	impl_fixed_hash_serde!(H456, 57);
@@ -239,7 +239,7 @@ impl TryFrom<U256> for U128 {
 	fn try_from(value: U256) -> Result<U128, Error> {
 		let U256(ref arr) = value;
 		if arr[2] | arr[3] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 2];
 		ret[0] = arr[0];
@@ -254,7 +254,7 @@ impl TryFrom<U512> for U256 {
 	fn try_from(value: U512) -> Result<U256, Error> {
 		let U512(ref arr) = value;
 		if arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 4];
 		ret[0] = arr[0];
@@ -271,7 +271,7 @@ impl TryFrom<U512> for U128 {
 	fn try_from(value: U512) -> Result<U128, Error> {
 		let U512(ref arr) = value;
 		if arr[2] | arr[3] | arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 2];
 		ret[0] = arr[0];
@@ -318,7 +318,7 @@ impl<'a> TryFrom<&'a U512> for U256 {
 	fn try_from(value: &'a U512) -> Result<U256, Error> {
 		let U512(ref arr) = *value;
 		if arr[4] | arr[5] | arr[6] | arr[7] != 0 {
-			return Err(Error::Overflow);
+			return Err(Error::Overflow)
 		}
 		let mut ret = [0; 4];
 		ret[0] = arr[0];
