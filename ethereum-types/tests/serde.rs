@@ -122,9 +122,7 @@ fn test_h1368() {
 	for (number, expected) in tests.clone() {
 		assert_eq!(format!("{:?}", expected), ser::to_string_pretty(&number).unwrap());
 		assert_eq!(number, ser::from_str(&format!("{:?}", expected)).unwrap());
-	}
 
-	for (number, expected) in tests {
 		assert_eq!(number, ser::from_str(expected).unwrap());
 	}
 }
