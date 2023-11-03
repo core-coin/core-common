@@ -137,7 +137,7 @@ mod num_traits {
 #[cfg(feature = "impl-serde")]
 mod serde {
 	use super::*;
-	use impl_serde::{impl_fixed_hash_serde, impl_uint_serde};
+	use impl_serde::{impl_fixed_hash_serde, impl_uint_serde, impl_fixed_hash_serde_no_0x_prefix};
 
 	impl_uint_serde!(U128, 2);
 	impl_uint_serde!(U256, 4);
@@ -147,7 +147,7 @@ mod serde {
 
 	impl_fixed_hash_serde!(H128, 16);
 	impl_fixed_hash_serde!(H160, 20);
-	impl_fixed_hash_serde!(H176, 22);
+	impl_fixed_hash_serde_no_0x_prefix!(H176, 22);
 	impl_fixed_hash_serde!(H256, 32);
 	impl_fixed_hash_serde!(H384, 48);
 	impl_fixed_hash_serde!(H456, 57);

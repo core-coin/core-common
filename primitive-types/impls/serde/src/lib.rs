@@ -64,7 +64,37 @@ macro_rules! impl_fixed_hash_serde {
 				S: $crate::serde::Serializer,
 			{
 				let mut slice = [0u8; 2 + 2 * $len];
-				$crate::serialize::serialize_raw(&mut slice, &self.0, serializer)
+				$crate::serialize::serialize_raw(&mut slice, &self.0, serializer, false)
+			}
+		}
+
+		impl<'de> $crate::serde::Deserialize<'de> for $name {
+			fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+			where
+				D: $crate::serde::Deserializer<'de>,
+			{
+				let mut bytes = [0u8; $len];
+				$crate::serialize::deserialize_check_len(
+					deserializer,
+					$crate::serialize::ExpectedLen::Exact(&mut bytes),
+				)?;
+				Ok($name(bytes))
+			}
+		}
+	};
+}
+
+/// Add Serde serialization support to a fixed-sized hash type created by `construct_fixed_hash!` and which do not need 0x prefix.
+#[macro_export]
+macro_rules! impl_fixed_hash_serde_no_0x_prefix {
+	($name: ident, $len: expr) => {
+		impl $crate::serde::Serialize for $name {
+			fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+			where
+				S: $crate::serde::Serializer,
+			{
+				let mut slice = [0u8; 2 * $len];
+				$crate::serialize::serialize_raw(&mut slice, &self.0, serializer, true)
 			}
 		}
 

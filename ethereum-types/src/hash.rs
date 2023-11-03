@@ -94,6 +94,7 @@ impl_uint_conversions!(H1368, U1368);
 
 #[cfg(test)]
 mod tests {
+	use crate::Address;
 	use super::{H160, H256};
 	use serde_json as ser;
 
@@ -114,6 +115,20 @@ mod tests {
 			assert_eq!(number, ser::from_str(&format!("{:?}", expected)).unwrap());
 		}
 	}
+
+	#[test]
+	fn test_serialize_h176() {
+		let tests = vec![
+			(Address::from_low_u64_be(0), "00000000000000000000000000000000000000000000"),
+			(Address::from_low_u64_be(1_000), "000000000000000000000000000000000000000003e8"),
+		];
+
+		for (number, expected) in tests {
+			assert_eq!(format!("{:?}", expected), ser::to_string_pretty(&number).unwrap());
+			assert_eq!(number, ser::from_str(&format!("{:?}", expected)).unwrap());
+		}
+	}
+
 
 	#[test]
 	fn test_serialize_h256() {

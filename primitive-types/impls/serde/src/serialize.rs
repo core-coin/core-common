@@ -34,16 +34,21 @@ pub fn to_hex(bytes: &[u8], skip_leading_zero: bool) -> String {
 	};
 
 	let mut slice = vec![0u8; (bytes.len() + 1) * 2];
-	to_hex_raw(&mut slice, bytes, skip_leading_zero).into()
+	to_hex_raw(&mut slice, bytes, skip_leading_zero, false).into()
 }
 
-fn to_hex_raw<'a>(v: &'a mut [u8], bytes: &[u8], skip_leading_zero: bool) -> &'a str {
-	assert!(v.len() > 1 + bytes.len() * 2);
+fn to_hex_raw<'a>(v: &'a mut [u8], bytes: &[u8], skip_leading_zero: bool, cut_prefix: bool) -> &'a str {
+	let mut idx = 0;
+	// if we need 0x prefix
+	if !cut_prefix {
+		v[0] = b'0';
+		v[1] = b'x';
 
-	v[0] = b'0';
-	v[1] = b'x';
-
-	let mut idx = 2;
+		idx = 2;
+		assert!(v.len() > 1 + bytes.len() * 2);
+	} else {
+		assert!(v.len() > bytes.len() * 2 - 1);
+	}
 	let first_nibble = bytes[0] >> 4;
 	if first_nibble != 0 || !skip_leading_zero {
 		v[idx] = CHARS[first_nibble as usize];
@@ -139,14 +144,14 @@ fn from_hex_raw(v: &str, bytes: &mut [u8], stripped: bool) -> Result<usize, From
 }
 
 /// Serializes a slice of bytes.
-pub fn serialize_raw<S>(slice: &mut [u8], bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
+pub fn serialize_raw<S>(slice: &mut [u8], bytes: &[u8], serializer: S, cut_prefix: bool) -> Result<S::Ok, S::Error>
 where
 	S: Serializer,
 {
 	if bytes.is_empty() {
 		serializer.serialize_str("0x")
 	} else {
-		serializer.serialize_str(to_hex_raw(slice, bytes, false))
+		serializer.serialize_str(to_hex_raw(slice, bytes, false, cut_prefix))
 	}
 }
 
@@ -156,7 +161,7 @@ where
 	S: Serializer,
 {
 	let mut slice = vec![0u8; (bytes.len() + 1) * 2];
-	serialize_raw(&mut slice, bytes, serializer)
+	serialize_raw(&mut slice, bytes, serializer, false)
 }
 
 /// Serialize a slice of bytes as uint.
@@ -171,7 +176,7 @@ where
 	if bytes.is_empty() {
 		serializer.serialize_str("0x0")
 	} else {
-		serializer.serialize_str(to_hex_raw(slice, bytes, true))
+		serializer.serialize_str(to_hex_raw(slice, bytes, true, false))
 	}
 }
 
