@@ -94,8 +94,8 @@ impl_uint_conversions!(H1368, U1368);
 
 #[cfg(test)]
 mod tests {
-	use crate::Address;
 	use super::{H160, H256};
+	use crate::Address;
 	use serde_json as ser;
 
 	#[test]
@@ -128,7 +128,6 @@ mod tests {
 			assert_eq!(number, ser::from_str(&format!("{:?}", expected)).unwrap());
 		}
 	}
-
 
 	#[test]
 	fn test_serialize_h256() {
