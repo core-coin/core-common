@@ -8,7 +8,10 @@
 
 //! Testing to and from f64 lossy for U256 primitive type.
 
-use primitive_types::{H160, H176, H256, U256};
+use primitive_types::{H160, H176, H256, U256, U1368};
+use serde_json;
+use serde::{Serialize, Deserialize};
+
 
 #[test]
 #[allow(clippy::float_cmp)]
@@ -91,3 +94,17 @@ fn hash_prefix() {
 
 	assert_eq!(H256::default().to_string(), "0x0000…0000");
 }
+
+#[test]
+#[cfg(feature = "impl-serde")]
+fn serde_u1368() {
+	#[derive(Debug, Serialize, Deserialize)]
+	pub struct Foo {
+    	pub u1368: U1368,
+	}
+	let u1368 = r#"{"u1368": "0x0fbac47922e6e0649343400231a15e26f4f5ab1490fa5e243470de6ca26fd3583b7fa03170600a37b29d214fa618a32d6c2a121552f556578097176bf2ccb9dee0f37e8547d8f5981b6b998f99bf24c92e08b61ca5a7da5ab3da43986881356af9ad55e9b9481432cb1194a7c1302bc72500ba277941fcb9ac8063a9b6ed64fbc86c51dd5ae6cf1f01f7bcf533cf0b0cfc5dc3fdc5bc7eaa99366ada5e7127331b862586a46c12a85f9580"}"#;
+
+	let deserialized: Foo = serde_json::from_str(u1368).unwrap();
+	assert_eq!(format!("0x{:02x}", deserialized.u1368), "0x0fbac47922e6e0649343400231a15e26f4f5ab1490fa5e243470de6ca26fd3583b7fa03170600a37b29d214fa618a32d6c2a121552f556578097176bf2ccb9dee0f37e8547d8f5981b6b998f99bf24c92e08b61ca5a7da5ab3da43986881356af9ad55e9b9481432cb1194a7c1302bc72500ba277941fcb9ac8063a9b6ed64fbc86c51dd5ae6cf1f01f7bcf533cf0b0cfc5dc3fdc5bc7eaa99366ada5e7127331b862586a46c12a85f9580");
+}
+
