@@ -16,11 +16,11 @@ use criterion::{criterion_group, criterion_main};
 use uint::{construct_uint, uint_full_mul_reg};
 
 construct_uint! {
-	pub struct U256(4);
+	pub struct U256(4, 32);
 }
 
 construct_uint! {
-	pub struct U512(8);
+	pub struct U512(8, 64);
 }
 
 impl U256 {

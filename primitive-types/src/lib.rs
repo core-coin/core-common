@@ -33,36 +33,36 @@ pub enum Error {
 construct_uint! {
 	/// 128-bit unsigned integer.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
-	pub struct U128(2);
+	pub struct U128(2, 16);
 }
 construct_uint! {
 	/// 256-bit unsigned integer.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
-	pub struct U256(4);
+	pub struct U256(4, 32);
 }
 
 construct_uint! {
 	/// 448-bit unsigned integer.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
-	pub struct U448(7);
+	pub struct U448(7, 56);
 }
 
 construct_uint! {
 	/// 456-bit unsigned integer.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
-	pub struct U456(8);
+	pub struct U456(8, 57);
 }
 
 construct_uint! {
 	/// 512-bits unsigned integer.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
-	pub struct U512(8);
+	pub struct U512(8, 64);
 }
 
 construct_uint! {
 	/// 1368-bits unsigned integer.
 	#[cfg_attr(feature = "scale-info", derive(TypeInfo))]
-	pub struct U1368(22);
+	pub struct U1368(22, 171);
 }
 
 construct_fixed_hash! {

@@ -10,7 +10,7 @@
 extern crate uint;
 
 construct_uint! {
-	pub struct U256(4);
+	pub struct U256(4, 32);
 }
 
 fn main() {

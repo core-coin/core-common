@@ -20,7 +20,7 @@ use uint::*;
 mod input;
 
 construct_uint! {
-	pub struct U256(4);
+	pub struct U256(4, 32);
 }
 
 impl_uint_serde!(U256, 4);

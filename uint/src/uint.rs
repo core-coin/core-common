@@ -469,11 +469,11 @@ macro_rules! impl_mul_for_primitive {
 #[macro_export]
 macro_rules! construct_uint {
 	( $(#[$attr:meta])* $visibility:vis struct $name:ident (1); ) => {
-		$crate::construct_uint!{ @construct $(#[$attr])* $visibility struct $name (1); }
+		$crate::construct_uint!{ @construct $(#[$attr])* $visibility struct $name (1, 8); }
 	};
 
-	( $(#[$attr:meta])* $visibility:vis struct $name:ident ( $n_words:tt ); ) => {
-			$crate::construct_uint! { @construct $(#[$attr])* $visibility struct $name ($n_words); }
+	( $(#[$attr:meta])* $visibility:vis struct $name:ident ( $n_words:tt, $used_bytes:tt ); ) => {
+			$crate::construct_uint! { @construct $(#[$attr])* $visibility struct $name ($n_words, $used_bytes); }
 
 			impl $crate::core_::convert::From<u128> for $name {
 				fn from(value: u128) -> $name {
@@ -549,7 +549,7 @@ macro_rules! construct_uint {
 				}
 			}
 	};
-	( @construct $(#[$attr:meta])* $visibility:vis struct $name:ident ( $n_words:tt ); ) => {
+	( @construct $(#[$attr:meta])* $visibility:vis struct $name:ident ( $n_words:tt, $used_bytes:tt ); ) => {
 		/// Little-endian large integer type
 		#[repr(C)]
 		$(#[$attr])*
@@ -1298,10 +1298,19 @@ macro_rules! construct_uint {
 						}
 					}
 				}
+				/*
+					 i - number of written hex symbols
+					 $used_bytes * 2 - number of hex symbols that are used to represent the number
+					 if i != $used_bytes * 2 - then first symbols are zeros and we need to rotate them from the end to the beginning
+				 */
+				for i in i..$used_bytes*2 {
+					buf.rotate_right(1);
+					buf[0] = b'0';
+				}
 
 				// sequence of `'0'..'9' 'a'..'f' 'A'..'F'` chars is guaranteed to be a valid UTF8 string
 				let s = unsafe {
-					$crate::core_::str::from_utf8_unchecked(&buf[0..i])
+					$crate::core_::str::from_utf8_unchecked(&buf[0..$used_bytes*2])
 				};
 				f.pad_integral(true, "0x", s)
 			}

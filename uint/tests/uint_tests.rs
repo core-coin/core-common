@@ -11,11 +11,11 @@ use crunchy::unroll;
 use uint::{construct_uint, overflowing, FromDecStrErr};
 
 construct_uint! {
-	pub struct U256(4);
+	pub struct U256(4, 32);
 }
 
 construct_uint! {
-	pub struct U512(8);
+	pub struct U512(8, 64);
 }
 
 #[cfg(feature = "std")]
@@ -1384,13 +1384,13 @@ pub mod laws {
 		pub struct U64(1);
 	}
 	construct_uint! {
-		pub struct U256(4);
+		pub struct U256(4, 32);
 	}
 	construct_uint! {
-		pub struct U512(8);
+		pub struct U512(8, 64);
 	}
 	construct_uint! {
-		pub struct U1024(16);
+		pub struct U1024(16, 128);
 	}
 
 	uint_laws!(u64, U64);
