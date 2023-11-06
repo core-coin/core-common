@@ -8,6 +8,7 @@
 
 use alloc::{string::String, vec::Vec};
 use core::{fmt, result::Result};
+use std::println;
 use serde::{de, Deserializer, Serializer};
 
 static CHARS: &[u8] = b"0123456789abcdef";
@@ -139,7 +140,7 @@ fn from_hex_raw(v: &str, bytes: &mut [u8], stripped: bool) -> Result<usize, From
 			pos += 1;
 		}
 	}
-
+	println!("{:?}", bytes);
 	Ok(pos)
 }
 
@@ -263,13 +264,15 @@ where
 		}
 
 		fn visit_str<E: de::Error>(self, v: &str) -> Result<Self::Value, E> {
+			println!("{}: {}", "visit str", v.clone());
 			let (v, stripped) = v.strip_prefix("0x").map_or((v, false), |v| (v, true));
-
+			println!("{} {}", v.clone(), stripped);
 			let len = v.len();
 			let is_len_valid = match self.len {
 				ExpectedLen::Exact(ref slice) => len == 2 * slice.len(),
 				ExpectedLen::Between(min, ref slice) => len <= 2 * slice.len() && len > 2 * min,
 			};
+			println!("{}", is_len_valid.clone());
 
 			if !is_len_valid {
 				return Err(E::invalid_length(v.len(), &self))
@@ -279,15 +282,20 @@ where
 				ExpectedLen::Exact(slice) => slice,
 				ExpectedLen::Between(_, slice) => slice,
 			};
-
-			from_hex_raw(v, bytes, stripped).map_err(E::custom)
+			println!("{}", bytes.len());
+			println!("{} {:?} {}", v.clone(), bytes, stripped.clone());
+			let res = from_hex_raw(v, bytes, stripped).map_err(E::custom);
+			println!("{}", res.unwrap());
+			Ok(2)
 		}
 
 		fn visit_string<E: de::Error>(self, v: String) -> Result<Self::Value, E> {
+			println!("{}: {}", "visit string", v.clone());
 			self.visit_str(&v)
 		}
-
+		
 		fn visit_bytes<E: de::Error>(self, v: &[u8]) -> Result<Self::Value, E> {
+			println!("{}: {:?}", "visit bytes", &v.clone());
 			let len = v.len();
 			let is_len_valid = match self.len {
 				ExpectedLen::Exact(ref slice) => len == slice.len(),
@@ -322,6 +330,7 @@ where
 		fn visit_newtype_struct<D: Deserializer<'b>>(self, deserializer: D) -> Result<Self::Value, D::Error> {
 			deserializer.deserialize_bytes(self)
 		}
+
 	}
 
 	deserializer.deserialize_str(Visitor { len })
